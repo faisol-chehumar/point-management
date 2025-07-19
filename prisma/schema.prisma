@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and member management
+model User {
+  id                    String   @id @default(cuid())
+  email                 String   @unique
+  password              String
+  status                UserStatus @default(PENDING)
+  credits               Int      @default(0)
+  role                  UserRole @default(USER)
+  registrationDate      DateTime @default(now())
+  lastCreditDeduction   DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  creditLogs            CreditLog[]
+  
+  @@map("users")
+}
+
+// Credit log model for audit trail
+model CreditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  amount      Int
+  type        CreditLogType
+  reason      String?
+  adminId     String?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("credit_logs")
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  BLOCKED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CreditLogType {
+  ADDED
+  DEDUCTED
+  DAILY_DEDUCTION
+}
