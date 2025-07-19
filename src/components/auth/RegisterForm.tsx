@@ -99,6 +99,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                       type="email"
                       placeholder="Enter your email"
                       disabled={isLoading}
+                      aria-label="Email"
                       {...field}
                     />
                   </FormControl>
@@ -118,6 +119,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                       type="password"
                       placeholder="Enter your password"
                       disabled={isLoading}
+                      aria-label="Password"
                       {...field}
                     />
                   </FormControl>
@@ -140,6 +142,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                       type="password"
                       placeholder="Confirm your password"
                       disabled={isLoading}
+                      aria-label="Confirm Password"
                       {...field}
                     />
                   </FormControl>
@@ -148,7 +151,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
               )}
             />
             
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading} aria-label="Create Account">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Account
             </Button>

@@ -16,6 +16,7 @@ import {
 import UserStatusBadge from './UserStatusBadge'
 import UserApprovalDialog from './UserApprovalDialog'
 import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface User {
   id: string
@@ -214,17 +215,63 @@ export default function UserManagementTable({}: UserManagementTableProps = {}) {
     }
   }
 
-  if (loading && users.length === 0) {
-    return (
+function UserTableSkeleton() {
+  return (
+    <div className="space-y-4">
       <Card>
-        <CardContent className="p-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading users...</p>
+        <CardHeader>
+          <Skeleton className="h-8 w-1/2" />
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <Skeleton className="h-6 w-1/4" />
           </div>
         </CardContent>
       </Card>
-    )
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12"><Skeleton className="h-5 w-5" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-16" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-5 w-20" /></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-5" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ... (UserManagementTable component)
+
+  if (loading && users.length === 0) {
+    return <UserTableSkeleton />;
   }
 
   if (error) {

@@ -1,21 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import { z } from 'zod'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { registerLimiter } from '@/lib/rate-limiter';
 
 // Registration validation schema
 const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters long')
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
-})
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const remainingRequests = await registerLimiter.removeTokens(1);
+    if (remainingRequests < 0) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
+    const body = await request.json();
     
     // Validate input data
-    const validationResult = registerSchema.safeParse(body)
+    const validationResult = registerSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
         { 
@@ -24,15 +30,15 @@ export async function POST(request: NextRequest) {
           details: validationResult.error.issues
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { email, password } = validationResult.data
+    const { email, password } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
-    })
+    });
 
     if (existingUser) {
       return NextResponse.json(
@@ -41,12 +47,12 @@ export async function POST(request: NextRequest) {
           error: 'User with this email already exists' 
         },
         { status: 409 }
-      )
+      );
     }
 
     // Hash password
-    const saltRounds = 12
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create user with PENDING status
     const user = await prisma.user.create({
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
         role: true,
         registrationDate: true
       }
-    })
+    });
 
     return NextResponse.json(
       {
@@ -74,16 +80,16 @@ export async function POST(request: NextRequest) {
         data: user
       },
       { status: 201 }
-    )
+    );
 
   } catch (error) {
-    console.error('Registration error:', error)
+    console.error('Registration error:', error);
     return NextResponse.json(
       { 
         success: false, 
         error: 'Internal server error' 
       },
       { status: 500 }
-    )
+    );
   }
 }

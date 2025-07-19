@@ -27,23 +27,58 @@ model User {
   updatedAt             DateTime @updatedAt
   
   creditLogs            CreditLog[]
+  adminCreditLogs       CreditLog[] @relation("AdminCreditLogs")
+  adminAuditLogs        AuditLog[]  @relation("AdminAuditLogs")
   
   @@map("users")
 }
 
 // Credit log model for audit trail
 model CreditLog {
-  id          String   @id @default(cuid())
-  userId      String
-  amount      Int
-  type        CreditLogType
-  reason      String?
-  adminId     String?
-  createdAt   DateTime @default(now())
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id              String       @id @default(cuid())
+  userId          String
+  amount          Int
+  type            CreditLogType
+  reason          String?
+  adminId         String?
+  createdAt       DateTime     @default(now())
+  sessionId       String?
+  ipAddress       String?
+  userAgent       String?
+  source          CreditSource @default(MANUAL)
+  batchId         String?
+  previousBalance Int?
+  newBalance      Int?
+  metadata        Json?
+
+  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admin   User? @relation("AdminCreditLogs", fields: [adminId], references: [id])
+
   @@map("credit_logs")
+}
+
+model AuditLog {
+  id           String      @id @default(cuid())
+  action       AuditAction
+  entityType   String
+  entityId     String?
+  adminId      String?
+  sessionId    String?
+  ipAddress    String?
+  userAgent    String?
+  details      Json?
+  oldValues    Json?
+  newValues    Json?
+  success      Boolean     @default(true)
+  errorMessage String?
+  duration     Int?
+  createdAt    DateTime    @default(now())
+
+  admin User? @relation("AdminAuditLogs", fields: [adminId], references: [id])
+
+  @@map("audit_logs")
+  @@index([action, createdAt])
+  @@index([adminId, createdAt])
 }
 
 enum UserStatus {
@@ -62,4 +97,23 @@ enum CreditLogType {
   ADDED
   DEDUCTED
   DAILY_DEDUCTION
+}
+
+enum CreditSource {
+  MANUAL
+  AUTOMATED
+  API
+}
+
+enum AuditAction {
+  USER_LOGIN_SUCCESS
+  USER_LOGIN_FAILURE
+  USER_REGISTRATION
+  USER_STATUS_APPROVED
+  USER_STATUS_REJECTED
+  USER_STATUS_BLOCKED
+  CREDIT_ADJUSTMENT_ADD
+  CREDIT_ADJUSTMENT_DEDUCT
+  DAILY_CREDIT_DEDUCTION
+  ADMIN_API_ACCESS
 }

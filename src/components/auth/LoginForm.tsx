@@ -109,6 +109,7 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
                       type="email"
                       placeholder="Enter your email"
                       disabled={isLoading}
+                      aria-label="Email"
                       {...field}
                     />
                   </FormControl>
@@ -128,6 +129,7 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
                       type="password"
                       placeholder="Enter your password"
                       disabled={isLoading}
+                      aria-label="Password"
                       {...field}
                     />
                   </FormControl>
@@ -136,7 +138,7 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
               )}
             />
             
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading} aria-label="Sign In">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign In
             </Button>

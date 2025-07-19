@@ -1,8 +1,9 @@
-import { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from './prisma'
-import bcrypt from 'bcryptjs'
+import { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { prisma } from './prisma';
+import bcrypt from 'bcryptjs';
+import { loginLimiter } from './rate-limiter';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,32 +14,37 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
+        const remainingRequests = await loginLimiter.removeTokens(1);
+        if (remainingRequests < 0) {
+          throw new Error('Too many requests');
+        }
+
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required')
+          throw new Error('Email and password are required');
         }
 
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email
           }
-        })
+        });
 
         if (!user) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid email or password');
         }
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
-        )
+        );
 
         if (!isPasswordValid) {
-          throw new Error('Invalid email or password')
+          throw new Error('Invalid email or password');
         }
 
         // Check if user is rejected
         if (user.status === 'REJECTED') {
-          throw new Error('Your account has been rejected')
+          throw new Error('Your account has been rejected');
         }
 
         return {
@@ -47,7 +53,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           status: user.status,
           credits: user.credits
-        }
+        };
       }
     })
   ],

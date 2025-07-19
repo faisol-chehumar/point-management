@@ -30,6 +30,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       name: 'Credit Management',
       href: '/admin/credits',
       current: pathname === '/admin/credits'
+    },
+    {
+      name: 'Audit Log',
+      href: '/admin/audit',
+      current: pathname === '/admin/audit'
     }
   ]
 

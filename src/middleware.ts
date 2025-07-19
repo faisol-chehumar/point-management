@@ -1,37 +1,46 @@
-import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
+import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
+import { csrfProtect } from './middleware/csrf';
 
 export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const { pathname } = req.nextUrl
+  async function middleware(req) {
+    const token = req.nextauth.token;
+    const { pathname } = req.nextUrl;
+
+    // Apply CSRF protection to all state-changing API routes
+    if (pathname.startsWith('/api/') && req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'OPTIONS') {
+      const csrfResult = await csrfProtect(req, NextResponse.next());
+      if (csrfResult.status !== 200) {
+        return csrfResult;
+      }
+    }
 
     // Admin routes protection
     if (pathname.startsWith('/admin')) {
       if (!token || token.role !== 'ADMIN') {
-        return NextResponse.redirect(new URL('/auth/signin', req.url))
+        return NextResponse.redirect(new URL('/auth/signin', req.url));
       }
     }
 
     // Protected user routes
     if (pathname.startsWith('/dashboard')) {
       if (!token) {
-        return NextResponse.redirect(new URL('/auth/signin', req.url))
+        return NextResponse.redirect(new URL('/auth/signin', req.url));
       }
       
       // Redirect pending users to waiting page
       if (token.status === 'PENDING') {
-        return NextResponse.redirect(new URL('/pending', req.url))
+        return NextResponse.redirect(new URL('/pending', req.url));
       }
       
       // Block users with REJECTED status
       if (token.status === 'REJECTED') {
-        return NextResponse.redirect(new URL('/rejected', req.url))
+        return NextResponse.redirect(new URL('/rejected', req.url));
       }
       
       // Block users with BLOCKED status or zero credits (immediate blocking)
       if (token.status === 'BLOCKED' || token.credits <= 0) {
-        return NextResponse.redirect(new URL('/blocked', req.url))
+        return NextResponse.redirect(new URL('/blocked', req.url));
       }
     }
 
@@ -41,7 +50,7 @@ export default withAuth(
         return NextResponse.json(
           { success: false, error: 'Unauthorized' },
           { status: 401 }
-        )
+        );
       }
     }
 
@@ -50,21 +59,21 @@ export default withAuth(
         return NextResponse.json(
           { success: false, error: 'Unauthorized' },
           { status: 401 }
-        )
+        );
       }
       
       if (token.status === 'REJECTED') {
         return NextResponse.json(
           { success: false, error: 'Account has been rejected' },
           { status: 403 }
-        )
+        );
       }
       
       if (token.status === 'PENDING') {
         return NextResponse.json(
           { success: false, error: 'Account is pending approval' },
           { status: 403 }
-        )
+        );
       }
       
       // Critical: Block API access when credits reach 0
@@ -72,11 +81,11 @@ export default withAuth(
         return NextResponse.json(
           { success: false, error: 'Access denied: No credits remaining' },
           { status: 403 }
-        )
+        );
       }
     }
 
-    return NextResponse.next()
+    return NextResponse.next();
   },
   {
     callbacks: {
