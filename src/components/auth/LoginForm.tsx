@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -61,11 +61,19 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
           description: 'Welcome back to your dashboard.'
         })
         
-        // Call success callback or redirect
+        // Call success callback or redirect based on user role
         if (onSuccess) {
           onSuccess()
         } else {
-          router.push(callbackUrl)
+          // Get the updated session to check user role
+          const session = await getSession()
+          
+          // Redirect based on user role
+          if (session?.user?.role === 'ADMIN') {
+            router.push('/admin')
+          } else {
+            router.push(callbackUrl)
+          }
           router.refresh()
         }
       }

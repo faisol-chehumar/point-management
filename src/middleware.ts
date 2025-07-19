@@ -88,6 +88,7 @@ export default withAuth(
           pathname.startsWith('/auth') ||
           pathname === '/' ||
           pathname.startsWith('/api/auth') ||
+          pathname.startsWith('/api/credits/deduct-daily') ||
           pathname.startsWith('/_next') ||
           pathname.startsWith('/favicon')
         ) {

@@ -76,13 +76,25 @@ npm run start                      # Start production server
 npm run lint                       # Run ESLint
 ```
 
+### UI & Styling
+- **Tailwind CSS v4**: Project uses latest Tailwind CSS with updated configuration
+- **Shadcn/ui Components**: Pre-built UI components in `src/components/ui/`
+- **CSS Variables**: Design system using HSL color variables in `globals.css`
+- **Configuration**: `tailwind.config.ts` and `postcss.config.js` properly configured for v4
+
 ### Testing & Verification
 ```bash
 npx tsx scripts/test-db-connection.ts        # Test database connectivity
 npx tsx scripts/test-auth-system.ts          # Test authentication system
 npx tsx scripts/test-admin-system.ts         # Test admin functionality
 npx tsx scripts/test-credit-blocking.ts      # Test credit blocking system
+npx tsx scripts/test-daily-deduction.ts      # Test daily credit deduction system
 npx tsx scripts/verify-admin-implementation.ts  # Verify admin implementation
+```
+
+### Cron Jobs & Automation
+```bash
+npm run cron:start                       # Start cron job scheduler for daily deductions
 ```
 
 ## Database Configuration

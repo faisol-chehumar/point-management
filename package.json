@@ -23,7 +23,13 @@
     "docker:db:backup": "./scripts/docker-db.sh backup",
     "docker:db:reset": "./scripts/docker-db.sh reset",
     "docker:adminer": "./scripts/docker-db.sh adminer",
-    "dev:full": "npm run docker:db:start && npm run db:setup && npm run dev"
+    "dev:full": "npm run docker:db:start && npm run db:setup && npm run dev",
+    "cron:start": "tsx scripts/cron-jobs.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:admin-redirect": "tsx scripts/test-admin-login-redirect.ts"
   },
   "keywords": [
     "saas",
@@ -73,6 +79,8 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "playwright": "^1.54.1",
     "tsx": "^4.20.3"
   }
 }

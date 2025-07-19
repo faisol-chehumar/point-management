@@ -96,6 +96,17 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user }) {
       // Allow sign in for all users except rejected ones (handled in authorize)
       return true
+    },
+    async redirect({ url, baseUrl, token }) {
+      // If user is signing in and is an admin, redirect to admin dashboard
+      if (token?.role === 'ADMIN') {
+        return `${baseUrl}/admin`
+      }
+      
+      // For regular users, use default behavior or redirect to dashboard
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      if (new URL(url).origin === baseUrl) return url
+      return `${baseUrl}/dashboard`
     }
   },
   pages: {

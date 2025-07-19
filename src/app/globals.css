@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -50,8 +48,11 @@
 }
 
 @layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
   body {
-    background-color: white;
-    color: #111827;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
