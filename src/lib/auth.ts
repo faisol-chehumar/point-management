@@ -37,6 +37,7 @@ export const authOptions: NextAuthOptions = {
           credentials.password,
           user.password
         );
+        console.log('isPasswordValid', isPasswordValid);
 
         if (!isPasswordValid) {
           throw new Error('Invalid email or password');

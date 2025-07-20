@@ -87,7 +87,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" role="form">
             <FormField
               control={form.control}
               name="email"
@@ -152,7 +152,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             />
             
             <Button type="submit" className="w-full" disabled={isLoading} aria-label="Create Account">
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-label="Loading..." />}
               Create Account
             </Button>
           </form>

@@ -97,7 +97,7 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" role="form">
             <FormField
               control={form.control}
               name="email"
@@ -139,7 +139,7 @@ export function LoginForm({ onSuccess, callbackUrl = '/dashboard' }: LoginFormPr
             />
             
             <Button type="submit" className="w-full" disabled={isLoading} aria-label="Sign In">
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-label="Loading..." />}
               Sign In
             </Button>
           </form>

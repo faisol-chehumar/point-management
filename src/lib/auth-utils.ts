@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth'
 import { NextRequest } from 'next/server'
@@ -126,7 +127,6 @@ export async function getUserFromRequest(request: NextRequest) {
  */
 export async function checkAndBlockZeroCredits(userId?: string) {
   try {
-    const { prisma } = await import('./prisma')
     
     const whereClause = userId 
       ? { id: userId, credits: 0, status: 'APPROVED' as const }
