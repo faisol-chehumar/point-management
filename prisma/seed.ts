@@ -1,4 +1,4 @@
-import { PrismaClient, UserStatus, UserRole, CreditLogType } from '@prisma/client'
+import { PrismaClient, UserStatus, UserRole, CreditLogType, CreditSource } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -78,12 +78,14 @@ async function main() {
         type: CreditLogType.ADDED,
         reason: 'Initial credit allocation',
         adminId: admin.id,
+        source: CreditSource.MANUAL,
       },
       {
         userId: approvedUser.id,
         amount: -1,
         type: CreditLogType.DAILY_DEDUCTION,
         reason: 'Daily automatic deduction',
+        source: CreditSource.AUTOMATED,
       },
       {
         userId: approvedUser.id,
@@ -91,6 +93,7 @@ async function main() {
         type: CreditLogType.DEDUCTED,
         reason: 'Manual adjustment by admin',
         adminId: admin.id,
+        source: CreditSource.MANUAL,
       },
     ]
 
